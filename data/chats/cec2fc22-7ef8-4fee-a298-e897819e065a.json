@@ -1,0 +1,30 @@
+{
+  "id": "cec2fc22-7ef8-4fee-a298-e897819e065a",
+  "title": "hi",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hi"
+    },
+    {
+      "role": "assistant",
+      "content": "How can I help you today?"
+    },
+    {
+      "role": "user",
+      "content": "is it gud today"
+    },
+    {
+      "role": "assistant",
+      "content": "That's nice of you to ask! I'm an AI, so I don't have real-time access to current weather conditions or day-to-day events. However, I can suggest ways to find out what's going on in your area.\n\nYou can:\n\n* Check the local news or website for updates\n* Look at a weather app on your phone to see if it's cloudy or sunny outside\n* Ask voice assistants like Siri, Google Assistant, or Alexa for current information\n\nWould you like me to help with anything else?"
+    },
+    {
+      "role": "user",
+      "content": "what month is it "
+    },
+    {
+      "role": "assistant",
+      "content": "I can answer questions based on the provided text.\n\nSince the context is mixed, I will attempt to answer according to the BTech_CSE_2108.pdf file.\n\n1. Write a Pandas program to create specific date and time of 9:20 pm.\n```python\nfrom datetime import datetime \n\ndate = datetime.now() \nprint(\"Current Date:\", date.strftime(\"%d %B %Y\")) \n\ntime_ = datetime.strptime('9:20 PM', '%I:%M %p') \nnew_datetime = date.replace(hour=time_.hour, minute=time_.minute)\nprint(new_datetime.strftime(\"%d-%m-%Y\"))\n```\n2. Write a Pandas program to create local date and time.\n```python\nfrom datetime import datetime \n\ndate_time = datetime.now()\nlocal_date_time = {\n    'Date': date_time.date(),\n    'Time': date_time.time()\n}\nprint(local_date_time)\n```\n\n3. Write a Pandas program to create a date without time.\n```python\nfrom datetime import datetime \nimport pandas as pd \n\ndate = '2022-01-01'\ndf = pd.DataFrame({'Date': [date]})\nprint(df.sort_values(by='Date'))\n```\n4. Write a Pandas program to create current date.\n```python\nfrom datetime import datetime \nimport pandas as pd \nimport math \n\ndf = pd.DataFrame({'Current Date': [datetime.now().strftime('%d-%m-%Y')]})\nprint(df['Current Date'].iloc[0])\n```\n\n5. Write a Pandas program to print the days between two given dates.\n```python\nfrom datetime import datetime, timedelta \n\nstart_date1 = '2022-01-05'\nend_date1 = '2022-06-30'\n\ncurrent_date = datetime.now()\n\ndate1 = datetime.strptime(start_date1, '%Y-%m-%d')\ndate2 = datetime.strptime(end_date1, '%Y-%m-%d')\n\n# calculate the difference\ndifference = (date2 - date1).days\n\ntotal_days = 4 + (math.ceil(difference/30)-1)\n\nstart_date2 = current_date-strptime(start_date1)\nend_date2 = current_date-strptime(start_date2)-timedelta(days=total_days)\n\nprint(f'The difference between the start and end dates is {difference} days')\n```\n6. Write a Pandas program to create a Pivot table.\n```python\nimport pandas as pd \n\ndata = {\n    'Name': ['John', 'Anna', 'Peter', 'Linda'],\n    'Age': [28, 24, 35, 32],\n    'Country': ['USA', 'UK', 'Australia', 'Germany']\n}\n\ndf = pd.DataFrame(data)\n\npivot_table = pd.pivot_table(df, values='Age', index='Name', aggfunc='sum')\nprint(pivot_table)\n```\nPlease provide question 7 to continue"
+    }
+  ]
+}
