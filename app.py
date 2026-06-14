@@ -16,7 +16,7 @@ st.set_page_config(page_title="Multi-Agent RAG", page_icon="🔍", layout="wide"
 
 st.markdown("""
 <style>
-#MainMenu, footer { visibility: hidden; }
+#MainMenu, footer, [data-testid="stToolbar"] { visibility: hidden !important; display: none !important; }
 
 /* ── Collapse the hidden header space ───────── */
 header[data-testid="stHeader"] {

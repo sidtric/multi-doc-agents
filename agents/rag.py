@@ -17,7 +17,7 @@ class RAGAgent(Agent):
         queries = [query] + [q.strip() for q in response.choices[0].message.content.strip().split("\n") if q.strip()][:3]
         is_syllabus_query = any(k in query.lower() for k in ("syllabus", "unit", "course content", "curriculum"))
 
-        n_per_query = 10 if is_syllabus_query else 5
+        n_per_query = 15 if is_syllabus_query else 5
         scores = {}
         doc_map = {}
         for q in queries:
@@ -28,7 +28,7 @@ class RAGAgent(Agent):
                 doc_map[key] = (doc, meta.get("source", "unknown"))
 
         ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-        limit = 20 if is_syllabus_query else 12
+        limit = 40 if is_syllabus_query else 12
         result = [(doc_map[k][0], doc_map[k][1]) for k, _ in ranked[:limit]]
         self.log(f"retrieved {len(result)} chunks via RAG Fusion")
         return result

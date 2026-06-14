@@ -10,13 +10,11 @@ class Synthesizer(Agent):
         ctx_text = "\n\n---\n\n".join(f"[{src}]\n{text}" for text, src in context)
         return [
             {"role": "system", "content": (
-                "Answer using only the provided context. Reproduce information exactly as it appears — do not paraphrase, summarise, or add commentary.\n"
-                "If the question is about a syllabus or course content:\n"
-                "- SKIP sections labelled Course Objectives, Course Outcomes, or Prerequisites.\n"
-                "- List ALL units found in the context in order: Unit 1, Unit 2, Unit 3, Unit 4, Unit 5 etc.\n"
-                "- For each unit, reproduce the full topic list exactly as written in the document.\n"
-                "- Output nothing else — no intro sentence, no commentary.\n"
-                "If context is insufficient, say so."
+                "Answer the user's question using ONLY the provided context. Never use outside knowledge.\n"
+                "- If the user asks to explain or describe something: write a clear explanation using only what the context says.\n"
+                "- If the user asks for a syllabus or list: reproduce the relevant content exactly as written, skipping unrelated subjects.\n"
+                "- Only include content clearly relevant to the question — ignore chunks from other topics.\n"
+                "- If the answer is not in the context, say: 'I could not find this in the uploaded documents.' Do not guess."
             )},
             {"role": "user", "content": f"Context:\n{ctx_text}\n\nQuestion: {query}"}
         ]
