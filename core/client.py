@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-MODEL = "llama3.2"
+MODEL = "llama3"
 
 llm = OpenAI(
     base_url="http://localhost:11434/v1",

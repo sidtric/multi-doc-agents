@@ -19,7 +19,7 @@ When you ask a question, a team of AI agents work together:
 ### Key Technologies Used
 | Technology | Purpose |
 |---|---|
-| Ollama + LLaMA 3.2 | Local LLM (runs on your machine, free) |
+| Ollama + Llama 3 (8B) | Local LLM (runs on your machine, free) |
 | ChromaDB | Vector database to store and search document chunks |
 | SentenceTransformer | Converts text to embeddings for semantic search |
 | RAG Fusion + RRF | Advanced retrieval — generates multiple queries and reranks results |
@@ -87,7 +87,7 @@ pip install -r requirements.txt
 ### 2. Ollama (local LLM — required)
 Download and install from [ollama.com](https://ollama.com), then:
 ```bash
-ollama pull llama3.2
+ollama pull llama3
 ```
 
 ### 3. Tesseract (for image OCR — optional)
@@ -136,4 +136,4 @@ multi-doc-rag/
 
 - The `data/` folder (ChromaDB, chats, reports) is gitignored — everyone starts fresh
 - No API keys required — everything runs locally via Ollama
-- Default model: `llama3.2` (can be changed in `core/client.py`)
+- Default model: `llama3` (8B; swap to `llama3.2` for a faster, lighter model) (can be changed in `core/client.py`)
