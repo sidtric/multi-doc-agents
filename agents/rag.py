@@ -1,5 +1,14 @@
+import re
 from agents.base import Agent
 from core.client import llm, MODEL
+
+# words that mean the message depends on earlier turns ("explain it", "and the lab?", "the second one")
+_FOLLOW_UP = re.compile(
+    r"\b(it|its|that|this|these|those|they|them|their|he|she|his|her|"
+    r"first|second|third|fourth|last|one|ones|above|previous|more|else)\b"
+    r"|^(and|also|what about|how about|why|so)\b",
+    re.IGNORECASE,
+)
 
 
 class RAGAgent(Agent):
@@ -8,7 +17,7 @@ class RAGAgent(Agent):
 
     def condense(self, query, history):
         """Rewrite a follow-up ("explain the second one") into a standalone question."""
-        if not history:
+        if not history or not _FOLLOW_UP.search(query.strip()):
             return query
         convo = "\n".join(f"{m['role']}: {m['content'][:600]}" for m in history[-4:])
         response = llm.chat.completions.create(
@@ -27,7 +36,11 @@ class RAGAgent(Agent):
                 {"role": "user", "content": f"Conversation:\n{convo}\n\nLatest message: {query}"}
             ]
         )
-        standalone = response.choices[0].message.content.strip().strip('"') or query
+        lines = [l.strip().strip('"\'') for l in response.choices[0].message.content.splitlines() if l.strip()]
+        standalone = lines[-1] if lines else query
+        # small models sometimes answer instead of rewriting — fall back to the original message
+        if re.match(r"^(i |i'|sorry|unfortunately)", standalone, re.IGNORECASE) or len(standalone) > 200:
+            standalone = query
         self.log(f"standalone query: {standalone}")
         return standalone
 

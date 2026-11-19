@@ -436,22 +436,11 @@ with tab3:
                 unsafe_allow_html=True
             )
         else:
-            # render markdown inside a styled wrapper using a container
-            with st.container():
-                st.markdown(
-                    "<div style='display:flex;justify-content:flex-start;margin:0.4rem 0;'>",
-                    unsafe_allow_html=True
-                )
-                with st.container():
-                    st.markdown(
-                        "<div style='background:#ffffff;padding:0.75rem 1rem;"
-                        "border-radius:18px 18px 18px 4px;max-width:72%;display:inline-block;"
-                        "border:1px solid #e2e8f0;box-shadow:0 1px 2px rgba(0,0,0,0.06);'>",
-                        unsafe_allow_html=True
-                    )
-                    st.markdown(content)
-                    st.markdown("</div>", unsafe_allow_html=True)
-                st.markdown("</div>", unsafe_allow_html=True)
+            # each st.markdown is its own element, so raw <div> wrappers can't enclose the answer —
+            # use a bordered container in a left column instead
+            col, _ = st.columns([3, 1])
+            with col.container(border=True):
+                st.markdown(content)
 
     for msg in st.session_state.messages:
         render_bubble(msg["role"], msg["content"])
