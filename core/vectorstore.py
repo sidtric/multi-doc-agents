@@ -31,6 +31,10 @@ class VectorStore:
         results = self.collection.query(query_embeddings=[vec], n_results=n)
         return results["documents"][0], results["metadatas"][0]
 
+    def remove(self, source_name):
+        if self.collection:
+            self.collection.delete(where={"source": source_name})
+
     def count(self):
         return self.collection.count() if self.collection else 0
 

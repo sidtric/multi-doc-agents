@@ -1,6 +1,21 @@
 from fpdf import FPDF
 from datetime import datetime
 
+# core fonts (Helvetica) only support latin-1, so map common LLM unicode to plain equivalents
+_REPLACEMENTS = {
+    "•": "-", "●": "-", "▪": "-",
+    "–": "-", "—": "-", "−": "-",
+    "‘": "'", "’": "'", "“": '"', "”": '"',
+    "…": "...", "→": "->", " ": " ",
+}
+
+
+def _latin1(text):
+    text = str(text)
+    for k, v in _REPLACEMENTS.items():
+        text = text.replace(k, v)
+    return text.encode("latin-1", errors="replace").decode("latin-1")
+
 
 class _PDF(FPDF):
     def header(self):
@@ -29,7 +44,7 @@ def generate_pdf(source_name, analysis):
 
     pdf.set_font("Helvetica", "", 11)
     pdf.set_text_color(100, 100, 100)
-    pdf.cell(0, 8, f"Source file: {source_name}", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, _latin1(f"Source file: {source_name}"), align="C", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 8, f"Generated: {datetime.now().strftime('%d %B %Y  %H:%M')}", align="C", new_x="LMARGIN", new_y="NEXT")
     pdf.ln(3)
 
@@ -50,9 +65,9 @@ def generate_pdf(source_name, analysis):
     pdf.set_text_color(0, 0, 0)
     for k, v in analysis.get("stats", {}).items():
         pdf.set_font("Helvetica", "B", 11)
-        pdf.cell(65, 8, f"{k}:")
+        pdf.cell(65, 8, _latin1(f"{k}:"))
         pdf.set_font("Helvetica", "", 11)
-        pdf.cell(0, 8, str(v), new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(0, 8, _latin1(v), new_x="LMARGIN", new_y="NEXT")
     pdf.ln(6)
 
     # Summary
@@ -66,6 +81,6 @@ def generate_pdf(source_name, analysis):
 
     pdf.set_font("Helvetica", "", 11)
     pdf.set_text_color(0, 0, 0)
-    pdf.multi_cell(0, 7, analysis.get("summary", ""))
+    pdf.multi_cell(0, 7, _latin1(analysis.get("summary", "")))
 
     return bytes(pdf.output())

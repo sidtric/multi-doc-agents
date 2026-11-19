@@ -1,4 +1,5 @@
 import os
+import html
 from datetime import datetime
 from dotenv import load_dotenv
 import streamlit as st
@@ -391,6 +392,8 @@ with tab1:
                     st.success(f"✅ Done — {len(chunks)} chunks indexed from **{f.name}**")
 
                 except Exception as e:
+                    # roll back partially indexed chunks so a retry doesn't duplicate them
+                    st.session_state.vs.remove(f.name)
                     progress.empty()
                     status_ph.empty()
                     st.error(f"Error: {e}")
@@ -429,7 +432,7 @@ with tab3:
                 f"<div style='background:#c0392b;color:white;padding:0.65rem 1rem;"
                 f"border-radius:18px 18px 4px 18px;max-width:72%;"
                 f"font-size:0.95rem;line-height:1.5;word-wrap:break-word;'>"
-                f"{content}</div></div>",
+                f"{html.escape(content)}</div></div>",
                 unsafe_allow_html=True
             )
         else:
@@ -456,12 +459,16 @@ with tab3:
     query = st.chat_input("Ask a question about your documents or anything...")
 
     if query:
+        history = list(st.session_state.messages)
         st.session_state.messages.append({"role": "user", "content": query})
         render_bubble("user", query)
 
         with st.status("Running agents...", expanded=True) as status:
             has_docs = st.session_state.vs.count() > 0
-            decision = router.run(query, has_docs)
+            standalone = rag_agent.condense(query, history)
+            if standalone != query:
+                st.write(f"🧩 **Follow-up rewritten** → _{standalone}_")
+            decision = router.run(standalone, has_docs)
             st.write(f"🔀 **Router** → `{decision}`")
 
             if decision == "chat":
@@ -470,7 +477,8 @@ with tab3:
                     for chunk in llm.chat.completions.create(
                         model=MODEL,
                         messages=[
-                            {"role": "system", "content": "You are a helpful assistant. Reply naturally and concisely."},
+                            {"role": "system", "content": "You are a helpful assistant. Reply naturally and concisely."}
+                        ] + [{"role": m["role"], "content": m["content"]} for m in history[-6:]] + [
                             {"role": "user", "content": query}
                         ],
                         stream=True
@@ -482,20 +490,20 @@ with tab3:
                 context = []
                 if decision in ("rag", "both"):
                     if has_docs:
-                        docs = rag_agent.run(query, st.session_state.vs)
+                        docs = rag_agent.run(standalone, st.session_state.vs)
                         context.extend(docs)
                         st.write(f"📚 **RAG Agent** → retrieved {len(docs)} chunks via RAG Fusion")
                     else:
                         st.write("📚 **RAG Agent** → skipped (no documents loaded)")
 
                 if decision in ("web", "both"):
-                    snippets = web_agent.run(query)
+                    snippets = web_agent.run(standalone)
                     context.extend(snippets)
                     st.write(f"🌐 **Web Agent** → fetched {len(snippets)} results")
 
                 st.write("✍️ **Synthesizer** → streaming...")
                 def _chat_stream():
-                    return synthesizer.stream(query, context)
+                    return synthesizer.stream(standalone, context, history)
 
             status.update(label="✅ Done", state="complete")
 
